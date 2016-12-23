@@ -66,6 +66,12 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         }
     }
 
+    @IBAction func random() {
+        let index = Int(arc4random_uniform(UInt32(songsList.count)))
+        songPicker.selectRow(index, inComponent: 0, animated: true)
+        playSong(index, true)
+    }
+
     @IBAction func increaseVol() {
         if audioPlayer != nil && audioPlayer.isPlaying && audioPlayer.volume < 1.0 {
             audioPlayer.volume += 0.1

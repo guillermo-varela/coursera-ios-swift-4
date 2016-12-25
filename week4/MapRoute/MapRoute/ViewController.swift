@@ -18,6 +18,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     private let locationManager = CLLocationManager()
     private var lastLocationAnnotated: CLLocation?
     private var distanceTraveled: Double = 0.0
+    private let distanceFilter = 50.0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +26,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.distanceFilter = distanceFilter
         locationManager.requestWhenInUseAuthorization()
 
         zoomSlider.transform = CGAffineTransform.init(rotationAngle: CGFloat(-M_PI_2))
@@ -59,13 +61,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
         distanceTraveled += distanceMeters
 
-        if lastLocationAnnotated == nil || distanceMeters >= 50.0 {
+        if lastLocationAnnotated == nil || distanceMeters >= distanceFilter {
             let annotation = MKPointAnnotation()
             let latitude = String(format: "%.2f", location.coordinate.latitude)
             let longitude = String(format: "%.2f", location.coordinate.longitude)
+
             annotation.title = "\(latitude), \(longitude)"
             annotation.subtitle = "\(String(format: "%.2f", distanceTraveled)) mts"
             annotation.coordinate = location.coordinate
+
             mapView.addAnnotation(annotation)
             lastLocationAnnotated = location
         }
@@ -84,7 +88,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
 
     @IBAction func zoomChanged() {
-        print(zoomSlider.value)
         let miles = Double(zoomSlider.value)
         let delta = miles / 69.0
 
